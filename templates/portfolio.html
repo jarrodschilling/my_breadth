@@ -1,0 +1,92 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Portfolio
+{% endblock %}
+
+{% block main %}
+    <h1 style="text-align: center;">Portfolios</h1>
+    <div class="container">
+
+        <div class="row">
+            {% if not portfolio1_name == "none" %}
+            <div class="col-md-4">
+                <div class="text-center">
+                    <a href="/add-portfolio/1" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Add</a>
+                    <a href="/delete-portfolio/1" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Delete</a>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ portfolio1_name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for stock in investments %}
+                            {% if stock[4] == "portfolio1" %}
+                            <tr>
+                                <td>
+                                    ({{ stock[1] }}) {{ stock[2] }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% if not portfolio2_name == "none" %}
+            <div class="col-md-4">
+                <div class="text-center">
+                    <a href="/add-portfolio/2" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Add</a>
+                    <a href="/delete-portfolio/2" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Delete</a>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ portfolio2_name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for stock in investments %}
+                            {% if stock[4] == "portfolio2" %}
+                            <tr>
+                                <td>
+                                    ({{ stock[1] }}) {{ stock[2] }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+            {% if not portfolio3_name == "none" %}
+            <div class="col-md-4">
+                <div class="text-center">
+                    <a href="/add-portfolio/3" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Add</a>
+                    <a href="/delete-portfolio/3" class="btn btn-primary mb-3" style="width: 100px; margin: 5px;">Delete</a>
+                </div>
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ portfolio3_name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for stock in investments %}
+                            {% if stock[4] == "portfolio3" %}
+                            <tr>
+                                <td>
+                                    ({{ stock[1] }}) {{ stock[2] }}
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

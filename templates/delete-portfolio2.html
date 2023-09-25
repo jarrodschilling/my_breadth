@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Delete
+{% endblock %}
+
+{% block main %}
+    <h1 style="text-align: center;">Portfolios</h1>
+    <div class="container">
+
+        <div class="row">
+            <div class="col-md-4">
+                <form action="/delete-portfolio" method="POST">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">{{ portfolio2_name }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for stock in investments %}
+                            {% if stock[4] == "portfolio2" %}
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <input type="hidden" name="id" value="2">
+                                        <input class="form-check-input" type="checkbox" value= "{{ stock[1] }}" id="symbol", name="symbols[]">
+                                        <label class="form-check-label" for="symbol">
+                                            ({{ stock[1] }}) {{ stock[2] }}
+                                        </label>
+                                      </div>
+                                </td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                    </tbody>
+                </table>
+                <button type="sumbit" class="btn btn-primary mb-3" style="width: 100px;">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}
