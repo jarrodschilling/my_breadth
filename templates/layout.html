@@ -22,25 +22,28 @@
                 <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
                     {% if session["user_id"] %}
                     <div class="navbar-nav me-2 mb-lg-0">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            CORE
-                          </a>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/sector-summary">Sector Summary</a></li>
-                            <li><a class="dropdown-item" href="/sector-detail">Sector Detail</a></li>
-                          </ul>
-                        <a class="nav-link" href="/portfolio">Portfolio</a>
-
-                        <!-- <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            Portfolio
-                          </a>
-                          <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/portfolio">Current Portfolio</a></li>
-                            <li><a class="dropdown-item" href="/summary">Breadth Summary</a></li>
-                            <li><a class="dropdown-item" href="/detail">Breadth Detail</a></li>
-                          </ul> -->
-                        <a class="nav-link" href="/summary">Summary</a>
-                        <a class="nav-link" href="/detail">Detail</a>
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                CORE
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/sector-summary">Sector Summary</a></li>
+                                <li><a class="dropdown-item" href="/sector-detail">Sector Detail</a></li>
+                            </ul>
+                        </div>
+                        <!-- <a class="nav-link" href="/portfolio">Portfolio</a> -->
+                        <div class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Portfolio
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="/portfolio">Current Portfolio</a></li>
+                                <li><a class="dropdown-item" href="/summary">Breadth Summary</a></li>
+                                <li><a class="dropdown-item" href="/detail">Breadth Detail</a></li>
+                            </ul>
+                        </div>
+                        <!-- <a class="nav-link" href="/summary">Summary</a>
+                        <a class="nav-link" href="/detail">Detail</a> -->
                         <a class="nav-link" href="/create-portfolio">Create Portfolio</a>
                         
                     </div>

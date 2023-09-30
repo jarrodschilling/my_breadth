@@ -2,6 +2,8 @@ import sqlite3
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
 from dictionaries import sectors, industries, sub_sectors
+from investor_quotes import quotes
+import random
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
 from functions import login_required, portfolio_names, symbol_check, register_errors, login_errors, is_valid_password, create_errors, ma_compute_yf, add_symbols, get_port_name
@@ -158,7 +160,8 @@ def signup_post():
 
 @app.route("/", methods=["GET"])
 def index():
-    return render_template("index.html")
+    random_quote = random.choice(quotes)
+    return render_template("index.html", quote=random_quote)
 
 # -------------------------------------------------------------------------------------------------------
 # -------------- CORE SECTOR DETAIL PAGE
