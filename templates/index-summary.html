@@ -1,0 +1,51 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    CORE Index Summary
+{% endblock %}
+
+{% block main %}
+    <h1 style="text-align: center;">CORE Index Summary</h1>
+    <table class="table" style="margin: 35px;">
+        <thead>
+            <tr>
+                <th scope="col">Portfolio</th>
+                <th scope="col">Above 20EMA</th>
+                <th scope="col">Above 50SMA</th>
+                <th scope="col">Above 200SMA</th>
+            </tr>
+        </thead>
+        <tbody>
+                {% if not portfolio1_ema20_summary == "none" %}
+                <tr>
+                    <th scope="row">{{ portfolio1_name }}</th>
+                    <td>{{ portfolio1_ema20_summary }}</td>
+                    <td>{{ portfolio1_sma50_summary }}</td>
+                    <td>{{ portfolio1_sma200_summary }}</td>
+                </tr>
+                {% endif %}
+                {% if not portfolio2_ema20_summary == "none" %}
+                <tr>
+                    <th scope="row">{{ portfolio2_name }}</th>
+                    <td>{{ portfolio2_ema20_summary }}</td>
+                    <td>{{ portfolio2_sma50_summary }}</td>
+                    <td>{{ portfolio2_sma200_summary }}</td>
+                </tr>
+                {% endif %}
+                {% if not portfolio3_ema20_summary == "none" %}
+                <tr>
+                    <th scope="row">{{ portfolio3_name }}</th>
+                    <td>{{ portfolio3_ema20_summary }}</td>
+                    <td>{{ portfolio3_sma50_summary }}</td>
+                    <td>{{ portfolio3_sma200_summary }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <th scope="row">Total</th>
+                    <td>{{ total_ema20 }}</td>
+                    <td>{{ total_sma50 }}</td>
+                    <td>{{ total_sma200 }}</td>
+                </tr>
+        </tbody>
+    </table>
+{% endblock %}

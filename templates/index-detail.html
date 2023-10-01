@@ -1,0 +1,200 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    CORE Index Detail
+{% endblock %}
+
+{% block main %}
+<h1 style="text-align: center;">CORE Index Detail</h1>
+<div class="container">
+    <div class="row">
+        {% if not portfolio1_name == "none" %}
+        <div class="col-md-4">
+            <h2>{{ portfolio1_name }}</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 20EMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio1_ema20 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio2_name == "none" %}
+        <div class="col-md-4">
+            <h2>{{ portfolio2_name }}</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 20EMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio2_ema20 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio3_name == "none" %}
+        <div class="col-md-4">
+            <h2>{{ portfolio3_name }}</h2>
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 20EMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio3_ema20 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row">
+        {% if not portfolio1_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 50SMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio1_sma50 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio2_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 50SMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio2_sma50 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio3_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 50SMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio3_sma50 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+    <div class="row">
+        {% if not portfolio1_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th scope="col">Above 200SMA</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                            {% for stock in portfolio1_sma200 %}
+                            <tr>
+                                <td>
+                                    ({{ stock[0] }}) {{ stock[1] }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                    </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio2_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 200SMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio2_sma200 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        {% if not portfolio3_name == "none" %}
+        <div class="col-md-4">
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th scope="col">Above 200SMA</th>
+                    </tr>
+                </thead>
+                <tbody>
+                        {% for stock in portfolio3_sma200 %}
+                        <tr>
+                            <td>
+                                ({{ stock[0] }}) {{ stock[1] }}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
