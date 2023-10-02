@@ -695,8 +695,7 @@ nasdaq = [
     "BZ",
     "BZFD",
     "BZFDW",
-    "BZUN",]
-nas_c = [
+    "BZUN",
     "CAAS",
     "CABA",
     "CAC",
@@ -732,8 +731,7 @@ nas_c = [
     "CBFV",
     "CBIO",
     "CBNK",
-    "CBRL",]
-rest = [
+    "CBRL",
     "CBSH",
     "CBUS",
     "CCAP",

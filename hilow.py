@@ -1,10 +1,10 @@
 from yahooquery import Ticker
 from nasdaq import nasdaq
-from nyse import nyse
+from nyse import clean_nyse
 import concurrent.futures
 import time
 
-# start = time.time()
+start = time.time()
 
 def check_equity(symbol):
     try:
@@ -15,7 +15,7 @@ def check_equity(symbol):
         print(f"Error for {symbol}: {str(e)}")
         return False
     
-symbols = nyse
+symbols = clean_nyse
 
 with concurrent.futures.ThreadPoolExecutor(max_workers=100) as executor:
         results = list(executor.map(check_equity, symbols))
