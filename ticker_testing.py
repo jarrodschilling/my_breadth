@@ -2,63 +2,67 @@ import sqlite3
 import pandas as pd
 import numpy as np
 import yfinance as yf
+from yahooquery import Ticker
 from datetime import datetime, timedelta
 import pytz
 import time
+from nasdaq import nas_c
 
-
-
-
-
-def symbol_check(symbol):
-    data = yf.download(symbol)
-    if data.empty:
-        return False
-    else:
-        name = yf.Ticker(symbol)
-        output = name.info['shortName']
-        return output
-
-def add_symbols(symbols_list, name, portfolio, portfolio_id, error_symbol_list):
-    # Remove empty symbols from array
-    symbols = []
-    for i in range(0, len(symbols_list)):
-        if symbols_list[i] != "":
-            symbols.append(symbols_list[i])
-    
-    # Make symbols uppercase
-    symbols_upper = [symbol.upper() for symbol in symbols]
-
-    
-    # INSERT Stocks into database
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    # Check that symbol and exchange are correct
-    error_symbol_list = error_symbol_list
-    for i in range(0, len(symbols_upper)):
-        # check to make sure symbol is correct for yfinance
-        if (symbol_check(symbols_upper[i]) != False):
-            stock_name = symbol_check(symbols[i])
-            cursor.execute("INSERT INTO finance (symbol, stockname, portfolio, portfolio_id, users_id) VALUES(?, ?, ?, ?, ?)", (symbols_upper[i], stock_name, portfolio, portfolio_id, name))
-        else:
-            error_symbol_list.append(symbols_upper[i])
-    
-    conn.commit()
-    conn.close()
 
 name = "1"
 portfolio = "ports 1"
 portfolio_id = "portfolio1"
 
 
-symbol1 = "AR"
-symbol2 = "XAR"
-symbol3 = "JPM"
+symbol1 = "JPM"
+symbol2 = "CSIQ"
+symbol3 = "CNCR"
 
-symbol_list = [symbol1, symbol2, symbol3]
-error_symbol_list = []
+# symbol_list = [symbol1, symbol2, symbol3]
+symbol_list = nas_c
 
-add_symbols(symbol_list, name, portfolio, portfolio_id, error_symbol_list)
 
-print(error_symbol_list)
+
+def current_price(symbol):
+    symbol_j = Ticker(symbol)
+    symbol_price = symbol_j.price[symbol]['regularMarketPrice']
+    # print(symbol_price)
+    return symbol_price
+
+def day_high(symbol):
+    symbol_j = Ticker(symbol)
+    symbol_day_high = symbol_j.price[symbol]['regularMarketDayHigh']
+    # print(symbol_day_high)
+    return symbol_day_high
+
+def day_low(symbol):
+    symbol_j = Ticker(symbol)
+    symbol_day_low = symbol_j.price[symbol]['regularMarketDayLow']
+    # print(symbol_day_low)
+    return symbol_day_low
+
+def fifty_two_high(symbol):
+    symbol_j = Ticker(symbol)
+    symbol_high = symbol_j.summary_detail[symbol]['fiftyTwoWeekHigh']
+    # print(symbol_high)
+    return symbol_high
+
+def fifty_two_low(symbol):
+    symbol_j = Ticker(symbol)
+    symbol_low = symbol_j.summary_detail[symbol]['fiftyTwoWeekLow']
+    # print(symbol_low)
+    return symbol_low
+
+
+def high_low_lists(symbol):
+    new_highs_list = []
+    new_lows_list = []
+    for i in range(0, len(symbol)):
+        if day_high(symbol[i]) >= fifty_two_high(symbol[i]):
+            new_highs_list.append(symbol[i])
+        elif day_low(symbol[i]) <= fifty_two_low(symbol[i]):
+            new_lows_list.append(symbol[i])
+    print(new_highs_list)
+    print(new_lows_list)
+
+high_low_lists(symbol_list)

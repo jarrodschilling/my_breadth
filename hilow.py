@@ -4,7 +4,7 @@ from nyse import nyse
 import concurrent.futures
 import time
 
-start = time.time()
+# start = time.time()
 
 def check_equity(symbol):
     try:
