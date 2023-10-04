@@ -65,4 +65,4 @@ def high_low_lists(symbol):
     net_hi_low = new_highs_list - new_lows_list
     print(net_hi_low)
 
-high_low_lists(symbol_list)
+current_price("JPM")

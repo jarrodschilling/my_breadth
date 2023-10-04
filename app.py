@@ -120,7 +120,7 @@ def signup_post():
     for user in usernames:
         if user[0] == username:
             return register_errors("That username already exists, please choose another one")
-       
+    
     # Check that username and password are each between 5 and 25 characters long
     if len(username) < 5:
         return register_errors("Username must be atleast 5 characters long")
@@ -162,6 +162,14 @@ def signup_post():
 def index():
     random_quote = random.choice(quotes)
     return render_template("index.html", quote=random_quote)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- FREQUENTLY ASKED QUESTIONS (FAQ)
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/faq", methods=["GET"])
+def faq():
+    return render_template("faq.html")
 
 # -------------------------------------------------------------------------------------------------------
 # -------------- CORE SECTOR DETAIL PAGE
