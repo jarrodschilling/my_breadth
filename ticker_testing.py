@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from yahooquery import Ticker
-from datetime import datetime, timedelta
+import datetime
 import pytz
 import time
 
@@ -19,50 +19,19 @@ symbol2 = "CSIQ"
 symbol3 = "CNCR"
 
 symbol_list = [symbol1, symbol2, symbol3]
-# symbol_list = nas_c
 
+# msft = yf.Ticker("MSFT")
 
+# print(msft.history())
+today = datetime.date.today()
+tomorrow = today + datetime.timedelta(days=1)
 
-def current_price(symbol):
-    symbol_j = Ticker(symbol)
-    symbol_price = symbol_j.price[symbol]['regularMarketPrice']
-    print(symbol_price)
-    return symbol_price
+start_date = "2022-01-01"
+end_date = tomorrow.strftime('%Y-%m-%d')
 
-def day_high(symbol):
-    symbol_j = Ticker(symbol)
-    symbol_day_high = symbol_j.price[symbol]['regularMarketDayHigh']
-    # print(symbol_day_high)
-    return symbol_day_high
+data = yf.download('JPM', start=start_date, end=end_date)
+print(data)
 
-def day_low(symbol):
-    symbol_j = Ticker(symbol)
-    symbol_day_low = symbol_j.price[symbol]['regularMarketDayLow']
-    print(symbol_day_low)
-    return symbol_day_low
+# jpm = Ticker('jpm')
 
-def fifty_two_high(symbol):
-    symbol_j = Ticker(symbol)
-    symbol_high = symbol_j.summary_detail[symbol]['fiftyTwoWeekHigh']
-    # print(symbol_high)
-    return symbol_high
-
-def fifty_two_low(symbol):
-    symbol_j = Ticker(symbol)
-    symbol_low = symbol_j.summary_detail[symbol]['fiftyTwoWeekLow']
-    print(symbol_low)
-    return symbol_low
-
-
-def high_low_lists(symbol):
-    new_highs_list = 0
-    new_lows_list = 0
-    for i in range(0, len(symbol)):
-        if day_high(symbol[i]) >= fifty_two_high(symbol[i]):
-            new_highs_list += 1
-        elif day_low(symbol[i]) <= fifty_two_low(symbol[i]):
-            new_lows_list += 1
-    net_hi_low = new_highs_list - new_lows_list
-    print(net_hi_low)
-
-current_price("JPM")
+# print(jpm.price['jpm']['regularMarketPrice'])
