@@ -20,21 +20,6 @@ symbol3 = "CNCR"
 
 symbol_list = [symbol1, symbol2, symbol3]
 
-# msft = yf.Ticker("MSFT")
-
-# print(msft.history())
-# today = datetime.date.today()
-# tomorrow = today + datetime.timedelta(days=1)
-
-# start_date = "2022-01-01"
-# end_date = tomorrow.strftime('%Y-%m-%d')
-
-# data = yf.download('JPM', start=start_date, end=end_date)
-# print(data)
-
-# jpm = Ticker('jpm')
-
-# print(jpm.price['jpm']['regularMarketPrice'])
 
 symbol="NVDA"
 date="today"
@@ -50,3 +35,13 @@ elif date == "today":
 data = yf.download(symbol, start=start_date, end=end_date)
 
 print(data)
+
+
+ema_period = 20
+
+data[f'EMA_{ema_period}'] = data['Close'].ewm(span=ema_period, adjust=False).mean()
+
+# Get the most recent day's closing 20 EMA
+most_recent_20_ema = data[f'EMA_{ema_period}'].iloc[-2]
+
+print(most_recent_20_ema)

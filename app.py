@@ -385,6 +385,7 @@ def detail_post():
     portfolio3_name = portfolio_names(portfolio3)
 
     portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", date)
+    
     portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", date)
     portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", date)
     portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", date)
