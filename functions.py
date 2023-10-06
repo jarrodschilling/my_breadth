@@ -5,6 +5,7 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 from datetime import datetime, timedelta
+import datetime
 import pytz
 import sqlite3
 
@@ -53,23 +54,28 @@ def login_errors(problem):
 data_cache = {}
 
 # Call the yfinance API for data needed and cache it
-def api_call(symbol):
+def api_call(symbol, date):
     if symbol in data_cache:
         return data_cache[symbol]
     
+    today = datetime.date.today()
+    tomorrow = today + datetime.timedelta(days=1)
     start_date = "2022-01-01"
-    end_date = datetime.today().strftime('%Y-%m-%d')
+    if date == "yesterday_close":
+        end_date = today.strftime('%Y-%m-%d')
+    elif date == "today":
+        end_date = tomorrow.strftime('%Y-%m-%d')
 
     # Fetch historical stock data
     data = yf.download(symbol, start=start_date, end=end_date)
     
     # Cache the data for future use
     data_cache[symbol] = data
-
+    
     return data
 
 
-# Get current price using API CALL data
+# Get current price using API CALL data ------------------------ **THIS NEEDS UPDATING**
 def current_price(data):
     data = data
     yesterday_closing_price = data['Close'].iloc[-1]
@@ -94,6 +100,7 @@ def ema(data, ema_period):
 def sma(data, sma_period):
     data = data
     sma_period = sma_period
+
     data[f'SMA_{sma_period}'] = data['Close'].rolling(window=sma_period).mean()
 
     most_recent_50_sma = data[f'SMA_{sma_period}'].iloc[-1]
@@ -102,15 +109,15 @@ def sma(data, sma_period):
 
 
 # Make batched API CALLS
-def batch_api_call(symbols):
+def batch_api_call(symbols, date):
     data = {}
     for symbol in symbols:
-        data[symbol] = api_call(symbol)
+        data[symbol] = api_call(symbol, date)
     return data
 
 
 # Iterate list of stocks to determine if they are above trending EMAs/SMAs
-def ma_compute_yf(stocks, portfolio_id, ma_avg):
+def ma_compute_yf(stocks, portfolio_id, ma_avg, date):
     portfolio_ma = []
     stock_name = []
 
@@ -118,7 +125,7 @@ def ma_compute_yf(stocks, portfolio_id, ma_avg):
     symbols_to_fetch = set(stock[1] for stock in stocks)
 
     # Batch API call for all symbols
-    data = batch_api_call(symbols_to_fetch)
+    data = batch_api_call(symbols_to_fetch, date)
 
     for stock in stocks:
         symbol = stock[1]

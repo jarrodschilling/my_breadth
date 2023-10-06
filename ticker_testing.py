@@ -23,15 +23,30 @@ symbol_list = [symbol1, symbol2, symbol3]
 # msft = yf.Ticker("MSFT")
 
 # print(msft.history())
-today = datetime.date.today()
-tomorrow = today + datetime.timedelta(days=1)
+# today = datetime.date.today()
+# tomorrow = today + datetime.timedelta(days=1)
 
-start_date = "2022-01-01"
-end_date = tomorrow.strftime('%Y-%m-%d')
+# start_date = "2022-01-01"
+# end_date = tomorrow.strftime('%Y-%m-%d')
 
-data = yf.download('JPM', start=start_date, end=end_date)
-print(data)
+# data = yf.download('JPM', start=start_date, end=end_date)
+# print(data)
 
 # jpm = Ticker('jpm')
 
 # print(jpm.price['jpm']['regularMarketPrice'])
+
+symbol="NVDA"
+date="today"
+today = datetime.date.today()
+tomorrow = today + datetime.timedelta(days=1)
+start_date = "2022-01-01"
+if date == "yesterday_close":
+    end_date = today.strftime('%Y-%m-%d')
+elif date == "today":
+    end_date = tomorrow.strftime('%Y-%m-%d')
+
+# Fetch historical stock data
+data = yf.download(symbol, start=start_date, end=end_date)
+
+print(data)

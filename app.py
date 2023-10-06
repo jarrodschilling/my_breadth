@@ -199,15 +199,15 @@ def sector_detail():
         portfolio2_name = portfolio_names(portfolio2)
         portfolio3_name = portfolio_names(portfolio3)
 
-        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
         
         conn.commit()
@@ -217,10 +217,10 @@ def sector_detail():
         return render_template("sector-detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE INDEX DETAIL PAGE
+# -------------- CORE INDEX DETAIL PAGE [GET]
 # -------------------------------------------------------------------------------------------------------
 
-@app.route("/index-detail", methods=["POST", "GET"])
+@app.route("/index-detail")
 @login_required
 def index_detail():
     if request.method == "GET":
@@ -244,15 +244,15 @@ def index_detail():
         portfolio2_name = portfolio_names(portfolio2)
         portfolio3_name = portfolio_names(portfolio3)
 
-        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
         
         conn.commit()
@@ -261,12 +261,59 @@ def index_detail():
 
         return render_template("index-detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
 
+# -------------------------------------------------------------------------------------------------------
+# -------------- CORE INDEX DETAIL PAGE [POST]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/index-detail", methods=["POST"])
+@login_required
+def index_detail_post():
+    print("successful")
+    date = request.form.get("date")
+    print(date)
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM indices")
+    stocks = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM indices WHERE portfolio_id = 'portfolio1'")
+    portfolio1 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM indices WHERE portfolio_id = 'portfolio2'")
+    portfolio2 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM indices WHERE portfolio_id = 'portfolio3'")
+    portfolio3 = cursor.fetchall()
+    
+    portfolio1_name = portfolio_names(portfolio1)
+    portfolio2_name = portfolio_names(portfolio2)
+    portfolio3_name = portfolio_names(portfolio3)
+
+    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", date)
+    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", date)
+    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", date)
+    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", date)
+    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", date)
+    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", date)
+    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", date)
+    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", date)
+    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", date)
+
+    
+    conn.commit()
+    conn.close()
+
+
+    return render_template("index-detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
+
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- DETAILED BREADTH PAGE
+# -------------- DETAILED BREADTH PAGE [GET]
 # -------------------------------------------------------------------------------------------------------
 
-@app.route("/detail", methods=["POST", "GET"])
+@app.route("/detail")
 @login_required
 def detail():
     if request.method == "GET":
@@ -291,21 +338,68 @@ def detail():
         portfolio2_name = portfolio_names(portfolio2)
         portfolio3_name = portfolio_names(portfolio3)
 
-        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+        portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+        portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+        portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+        portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+        portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+        portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+        portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+        portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+        portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
         
         conn.commit()
         conn.close()
 
         return render_template("detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- DETAILED BREADTH PAGE [POST]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/detail", methods=["POST"])
+@login_required
+def detail_post():
+    date = request.form.get("date")
+
+    name = session.get("user_id")
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT * FROM portfolios WHERE users_id = ?", (name,))
+    stocks = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio1' AND users_id = ?", (name,))
+    portfolio1 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio2' AND users_id = ?", (name,))
+    portfolio2 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio3' AND users_id = ?", (name,))
+    portfolio3 = cursor.fetchall()
+    
+    portfolio1_name = portfolio_names(portfolio1)
+    portfolio2_name = portfolio_names(portfolio2)
+    portfolio3_name = portfolio_names(portfolio3)
+
+    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", date)
+    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", date)
+    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", date)
+    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", date)
+    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", date)
+    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", date)
+    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", date)
+    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", date)
+    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", date)
+
+    
+    conn.commit()
+    conn.close()
+
+    return render_template("detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
+
 
 # -------------------------------------------------------------------------------------------------------
 # -------------- CREATE PORTFOLIO PAGE [GET]
@@ -536,15 +630,15 @@ def sector_summary():
     portfolio2_name = portfolio_names(portfolio2)
     portfolio3_name = portfolio_names(portfolio3)
 
-    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
     conn.commit()
     conn.close()
@@ -654,15 +748,15 @@ def index_summary():
     portfolio2_name = portfolio_names(portfolio2)
     portfolio3_name = portfolio_names(portfolio3)
 
-    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
     conn.commit()
     conn.close()
@@ -774,15 +868,15 @@ def summary():
     portfolio2_name = portfolio_names(portfolio2)
     portfolio3_name = portfolio_names(portfolio3)
 
-    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20")
-    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50")
-    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200")
-    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20")
-    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50")
-    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200")
-    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20")
-    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50")
-    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200")
+    portfolio1_ema20 = ma_compute_yf(stocks, "portfolio1", "ema20", "today")
+    portfolio1_sma50 = ma_compute_yf(stocks, "portfolio1", "sma50", "today")
+    portfolio1_sma200 = ma_compute_yf(stocks, "portfolio1", "sma200", "today")
+    portfolio2_ema20 = ma_compute_yf(stocks, "portfolio2", "ema20", "today")
+    portfolio2_sma50 = ma_compute_yf(stocks, "portfolio2", "sma50", "today")
+    portfolio2_sma200 = ma_compute_yf(stocks, "portfolio2", "sma200", "today")
+    portfolio3_ema20 = ma_compute_yf(stocks, "portfolio3", "ema20", "today")
+    portfolio3_sma50 = ma_compute_yf(stocks, "portfolio3", "sma50", "today")
+    portfolio3_sma200 = ma_compute_yf(stocks, "portfolio3", "sma200", "today")
 
     conn.commit()
     conn.close()
