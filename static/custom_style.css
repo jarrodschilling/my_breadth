@@ -12,3 +12,17 @@
 .faq-ul {
     text-align: left;
 }
+
+.contact {
+    margin: 50px;
+    /* display: flex;
+    justify-content: center; */
+}
+
+.contact input, textarea {
+    margin-bottom: 10px;
+}
+
+.contact textarea {
+    height: 100%;
+}
