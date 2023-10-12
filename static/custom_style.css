@@ -1,3 +1,7 @@
+h1 {
+    margin: 15px 0;
+}
+
 .quote-style {
     background-color: #82bbd1; 
     color: #30292f;
@@ -6,7 +10,9 @@
 .button-js {
     background-color: #0C7489;
     border: 1px solid #210203;
+    border-radius: 20px;
     color: #EDF2F4;
+    margin-bottom: 15px;
 }
 
 .faq-ul {
@@ -26,3 +32,4 @@
 .contact textarea {
     height: 100%;
 }
+

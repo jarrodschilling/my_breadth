@@ -15,6 +15,7 @@ indices = [
 ]
 
 
+
 sectors = [
     "XLI",
     "XLC",
@@ -102,6 +103,7 @@ sub_sectors = [
     "TAN",
     "CNCR",
 ]
+
 
 
 stocks = {

@@ -6,6 +6,12 @@
 
 {% block main %}
     <h1 style="text-align: center;">CORE Index Summary</h1>
+    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+        <form action="/index-summary" method="POST">
+            <button class="btn btn-primary button-js" type="submit" name="date" id="date" value="today">Current</button>
+            <button class="btn btn-primary button-js" type="submit" name="date" id="date" value="yesterday_close">Previous Close</button>
+        </form>
+    </div>
     <table class="table" style="margin: 35px;">
         <thead>
             <tr>
