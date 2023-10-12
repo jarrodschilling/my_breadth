@@ -7,15 +7,11 @@
 {% block main %}
 
 
-<form class="contact">
+<form class="contact" action="/contact" method="POST">
     <div class="col-md-6">
         <label for="name" class="form-label">Name</label>
         <input type="text" class="form-control" id="name" name="name">
     </div>
-    <!-- <div class="col-md-3">
-        <label for="last_name" class="form-label">Last Name</label>
-        <input type="text" class="form-control" id="input_last_name">
-    </div> -->
     <div class="col-md-6">
         <label for="email" class="form-label">Email Address</label>
         <input type="text" class="form-control" id="input_email" name="email">
@@ -25,7 +21,7 @@
         <textarea rows="4" class="form-control" id="message" name="message"></textarea>
     </div>
     <div class="col-md-6">
-        <button type="submit" class="btn btn-primary">Sign in</button>
+        <button type="submit" class="btn btn-primary">Contact</button>
     </div>
 </form>
 
