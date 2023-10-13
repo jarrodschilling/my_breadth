@@ -12,6 +12,12 @@ from functions import login_required, portfolio_names, symbol_check, register_er
 
 app = Flask(__name__)
 
+# TABLE OF CONTENTS
+# LOGIN/REGISTRATION PAGES: Setup Session/Cache, Login User, Log Out User, Register User
+# BASIC PAGES: Home Page, FAQ, Contact Form, Current Portfolios Page
+# PORTFOLIO CREATION/ALTERATION: Create Portfolio Page, Add to Portfolio, Delete From Portfolio
+
+
 
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # -----------------------------------------------------------------------------------------------
@@ -37,7 +43,7 @@ def after_request(response):
     return response
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- LOGIN PAGE [GET]
+# -------------- Login Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/login", methods=["GET"])
@@ -45,7 +51,7 @@ def login():
     return render_template("login.html")
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- LOGIN USER [POST] --------------------------------------------------------------------
+# -------------- Login User [POST] --------------------------------------------------------------------
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/login", methods=["POST"])
@@ -100,7 +106,7 @@ def logout():
 
 
 # -------------------------------------------------------------------------------------------------------
-# ------ REGISTRATION PAGE [GET]
+# ------ Resgistration Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/register")
@@ -108,7 +114,7 @@ def register():
     return render_template("register.html")
 
 # -------------------------------------------------------------------------------------------------------
-# ------ REGISTER USER [POST]
+# ------ Register User [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/register", methods=["POST"])
@@ -171,7 +177,7 @@ def signup_post():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- HOME PAGE
+# -------------- Home Page
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/", methods=["GET"])
@@ -180,7 +186,7 @@ def index():
     return render_template("index.html", quote=random_quote)
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- FREQUENTLY ASKED QUESTIONS (FAQ)
+# -------------- Frequently Asked Questions (FAQ)
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/faq", methods=["GET"])
@@ -188,7 +194,7 @@ def faq():
     return render_template("faq.html")
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CONTACT FORM PAGE [GET]
+# -------------- Contact Form Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/contact", methods=["GET"])
@@ -196,7 +202,7 @@ def contact():
     return render_template("contact.html")
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CONTACT FORM PAGE [POST]
+# -------------- Contact Form [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/contact", methods=["POST"])
@@ -208,15 +214,229 @@ def contact_post():
     return redirect("contact-complete.html")
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CONTACT THANK YOU MESSAGE [GET]
+# -------------- Contact Thank You Message [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/contact-complete", methods=["GET"])
 def contact_complete():
     return render_template("contact-complete.html")
 
+
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE SECTOR DETAIL PAGE [GET]
+# -------------- CURRENT PORTFOLIOS PAGE
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/portfolio")
+@login_required
+def portfolio_page():
+    name = session.get("user_id")
+
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE users_id = ?", (name,))
+    investments = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio1' AND users_id = ?", (name,))
+    portfolio1 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio2' AND users_id = ?", (name,))
+    portfolio2 = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio3' AND users_id = ?", (name,))
+    portfolio3 = cursor.fetchall()
+    
+    
+    portfolio1_name = portfolio_names(portfolio1)
+    portfolio2_name = portfolio_names(portfolio2)
+    portfolio3_name = portfolio_names(portfolio3)
+
+    conn.commit()
+    conn.close()
+
+    return render_template("portfolio.html", investments=investments, portfolio1=portfolio1, portfolio2=portfolio2, portfolio3=portfolio3, portfolio1_name=portfolio1_name, portfolio2_name=portfolio2_name, portfolio3_name=portfolio3_name)
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# -----------------------------------------------------------------------------------------------
+# ------------PORTFOLIO CREATION/ALTERATION
+# -----------------------------------------------------------------------------------------------
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- CREATE PORTFOLIO PAGE [GET]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/create-portfolio", methods=["GET"])
+@login_required
+def create_portfolio_page():
+    
+    name = session.get("user_id")
+    # Check to see if portfolio_id already exists for user
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    cursor.execute("SELECT portfolio_id FROM portfolios WHERE users_id = ?", (name,))
+    rows = cursor.fetchall()
+
+    port1 = ""
+    port2 = ""
+    port3 = ""
+
+    for row in range(0, len(rows)):
+        if rows[row][0] == "portfolio1":
+            port1 = True
+        if rows[row][0] == "portfolio2":
+            port2 = True
+        if rows[row][0] == "portfolio3":
+            port3 = True
+
+    conn.commit()
+    conn.close()
+
+    return render_template("create-portfolio.html", port1=port1, port2=port2, port3=port3)
+    
+
+# -------------------------------------------------------------------------------------------------------    
+# -------------- CREATE PORTFOLIO [POST] 
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/create-portfolio", methods=["POST"])
+@login_required
+def create_portfolio():
+
+    # Pull data from user form
+    name = session.get("user_id")
+    portfolio = request.form.get("portfolio")
+    portfolio_id = request.form.get("portfolio_id")
+    symbols_list = request.form.getlist("symbols[]")
+    error_symbol_list = []
+
+    # Check that symbols are correct using yfinance and if they are add to database
+    add_symbols(symbols_list, name, portfolio, portfolio_id, error_symbol_list)
+    
+    # For any symbols that are incorrect, let the user know what they are
+    if len(error_symbol_list) != 0:
+        return create_errors(f"Incorrect symbols: {error_symbol_list}. All other symbols added to portfolio {portfolio}")
+
+    return redirect("/portfolio")
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- ADD PORTFOLIO PAGE [GET]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/add-portfolio/<id>", methods=["GET"])
+@login_required
+def add_portfolio_page(id):
+
+    name = session.get("user_id")
+    portfolio_id = f"portfolio{id}"
+    portfolio = get_port_name(name, portfolio_id)
+
+    return render_template("add-portfolio.html", portfolio_id=portfolio_id, portfolio=portfolio)
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- ADD TO PORTFOLIO [POST]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/add-portfolio", methods=["POST"])
+@login_required
+def add_portfolio():
+
+    # Pull data from user form
+    name = session.get("user_id")
+    portfolio_id = request.form.get("portfolio_id")
+    symbols_list = request.form.getlist("symbols[]")
+    error_symbol_list = []
+    portfolio = get_port_name(name, portfolio_id)
+
+    # Check that symbols are correct using yfinance and if they are add to database
+    add_symbols(symbols_list, name, portfolio, portfolio_id, error_symbol_list)
+    
+    # For any symbols that are incorrect, let the user know what they are
+    if len(error_symbol_list) != 0:
+        return create_errors(f"Incorrect symbols: {error_symbol_list}. All other symbols added to portfolio {portfolio}")
+
+    return redirect("/portfolio")
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- DELETE FROM PORTFOLIO PAGE [GET]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/delete-portfolio/<id>", methods=["GET"])
+@login_required
+def delete_portfolio(id):
+    print("checking id out")
+    name = session.get("user_id")
+    portfolio_id = f"portfolio{id}"
+    portfolio = get_port_name(name, portfolio_id)
+
+    # Render current portfolios
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE users_id = ?", (name,))
+    investments = cursor.fetchall()
+    
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio1' AND users_id = ?", (name,))
+    portfolio1 = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio2' AND users_id = ?", (name,))
+    portfolio2 = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio3' AND users_id = ?", (name,))
+    portfolio3 = cursor.fetchall()
+    
+    
+    portfolio1_name = portfolio_names(portfolio1)
+    portfolio2_name = portfolio_names(portfolio2)
+    portfolio3_name = portfolio_names(portfolio3)
+
+    conn.commit()
+    conn.close()
+
+    return render_template(f"delete-portfolio{id}.html", portfolio_id=portfolio_id, portfolio=portfolio, investments=investments, portfolio1=portfolio1, portfolio1_name=portfolio1_name, portfolio2=portfolio2, portfolio2_name=portfolio2_name, portfolio3=portfolio3, portfolio3_name=portfolio3_name)
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- DELETE FROM PORTFOLIO [POST]
+# -------------------------------------------------------------------------------------------------------
+
+@app.route("/delete-portfolio", methods=["POST"])
+@login_required
+def delete_portfolio_post():
+
+    name = session.get("user_id")
+    id = request.form.get("id")
+    portfolio_id = f"portfolio{id}"
+    symbols = request.form.getlist("symbols[]")
+
+    # Delete symbols in symbol list from database
+    conn = sqlite3.connect('database.db')
+    cursor = conn.cursor()
+
+    for i in range(0, len(symbols)):
+        cursor.execute("DELETE FROM portfolios WHERE users_id = ? AND portfolio_id = ? AND symbol = ?", (name, portfolio_id, symbols[i],))
+
+    conn.commit()
+    conn.close()
+
+    return redirect("/portfolio")
+
+
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+# -----------------------------------------------------------------------------------------------
+# ------------DETAIL BREADTH PAGES
+# -----------------------------------------------------------------------------------------------
+#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
+
+
+# -------------------------------------------------------------------------------------------------------
+# -------------- CORE SECTOR Detail Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/sector-detail")
@@ -261,7 +481,7 @@ def sector_detail():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE SECTOR DETAIL PAGE [POST]
+# -------------- CORE SECTOR Detail [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/sector-detail", methods=["POST"])
@@ -308,7 +528,7 @@ def sector_detail_post():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE INDEX DETAIL PAGE [GET]
+# -------------- CORE INDEX Detail Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/index-detail")
@@ -352,8 +572,9 @@ def index_detail():
 
         return render_template("index-detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
 
+
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE INDEX DETAIL PAGE [POST]
+# -------------- CORE INDEX Detail [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/index-detail", methods=["POST"])
@@ -401,7 +622,7 @@ def index_detail_post():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- DETAILED BREADTH PAGE [GET]
+# -------------- PORTFOLIO Detailed Breadth Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/detail")
@@ -446,7 +667,7 @@ def detail():
         return render_template("detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- DETAILED BREADTH PAGE [POST]
+# -------------- PORTFOLIO Detailed Breadth [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/detail", methods=["POST"])
@@ -492,210 +713,6 @@ def detail_post():
     return render_template("detail.html", portfolio1_name=portfolio1_name, portfolio1_ema20=portfolio1_ema20, portfolio1_sma50=portfolio1_sma50, portfolio1_sma200=portfolio1_sma200, portfolio2_name=portfolio2_name, portfolio2_ema20=portfolio2_ema20, portfolio2_sma50=portfolio2_sma50, portfolio2_sma200=portfolio2_sma200, portfolio3_name=portfolio3_name, portfolio3_ema20=portfolio3_ema20, portfolio3_sma50=portfolio3_sma50, portfolio3_sma200=portfolio3_sma200)
 
 
-# -------------------------------------------------------------------------------------------------------
-# -------------- CREATE PORTFOLIO PAGE [GET]
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/create-portfolio", methods=["GET"])
-@login_required
-def create_portfolio_page():
-    
-    name = session.get("user_id")
-    # Check to see if portfolio_id already exists for user
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    cursor.execute("SELECT portfolio_id FROM portfolios WHERE users_id = ?", (name,))
-    rows = cursor.fetchall()
-
-    port1 = ""
-    port2 = ""
-    port3 = ""
-
-    for row in range(0, len(rows)):
-        if rows[row][0] == "portfolio1":
-            port1 = True
-        if rows[row][0] == "portfolio2":
-            port2 = True
-        if rows[row][0] == "portfolio3":
-            port3 = True
-
-    conn.commit()
-    conn.close()
-
-    return render_template("create-portfolio.html", port1=port1, port2=port2, port3=port3)
-    
-# -------------------------------------------------------------------------------------------------------    
-# -------------- CREATE PORTFOLIO [POST] 
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/create-portfolio", methods=["POST"])
-@login_required
-def create_portfolio():
-
-    # Pull data from user form
-    name = session.get("user_id")
-    portfolio = request.form.get("portfolio")
-    portfolio_id = request.form.get("portfolio_id")
-    symbols_list = request.form.getlist("symbols[]")
-    error_symbol_list = []
-
-    # Check that symbols are correct using yfinance and if they are add to database
-    add_symbols(symbols_list, name, portfolio, portfolio_id, error_symbol_list)
-    
-    # For any symbols that are incorrect, let the user know what they are
-    if len(error_symbol_list) != 0:
-        return create_errors(f"Incorrect symbols: {error_symbol_list}. All other symbols added to portfolio {portfolio}")
-
-    return redirect("/portfolio")
-
-
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-# -------------------------------------------------------------------------------------------------------
-# -------------- ADD PORTFOLIO 1 PAGE [GET]
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/add-portfolio/<id>", methods=["GET"])
-@login_required
-def add_portfolio_page(id):
-
-    name = session.get("user_id")
-    portfolio_id = f"portfolio{id}"
-    portfolio = get_port_name(name, portfolio_id)
-
-    return render_template("add-portfolio.html", portfolio_id=portfolio_id, portfolio=portfolio)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------- ADD TO PORTFOLIO 1 [POST]
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/add-portfolio", methods=["POST"])
-@login_required
-def add_portfolio():
-
-    # Pull data from user form
-    name = session.get("user_id")
-    portfolio_id = request.form.get("portfolio_id")
-    symbols_list = request.form.getlist("symbols[]")
-    error_symbol_list = []
-    portfolio = get_port_name(name, portfolio_id)
-
-    # Check that symbols are correct using yfinance and if they are add to database
-    add_symbols(symbols_list, name, portfolio, portfolio_id, error_symbol_list)
-    
-    # For any symbols that are incorrect, let the user know what they are
-    if len(error_symbol_list) != 0:
-        return create_errors(f"Incorrect symbols: {error_symbol_list}. All other symbols added to portfolio {portfolio}")
-
-    return redirect("/portfolio")
-
-# -------------------------------------------------------------------------------------------------------
-# -------------- DELETE FROM PORTFOLIO PAGE [GET]
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/delete-portfolio/<id>", methods=["GET"])
-@login_required
-def delete_portfolio(id):
-    print("checking id out")
-    name = session.get("user_id")
-    portfolio_id = f"portfolio{id}"
-    portfolio = get_port_name(name, portfolio_id)
-
-    # Render current portfolios
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE users_id = ?", (name,))
-    investments = cursor.fetchall()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio1' AND users_id = ?", (name,))
-    portfolio1 = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio2' AND users_id = ?", (name,))
-    portfolio2 = cursor.fetchall()
-
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio3' AND users_id = ?", (name,))
-    portfolio3 = cursor.fetchall()
-    
-    
-    portfolio1_name = portfolio_names(portfolio1)
-    portfolio2_name = portfolio_names(portfolio2)
-    portfolio3_name = portfolio_names(portfolio3)
-
-    conn.commit()
-    conn.close()
-
-    return render_template(f"delete-portfolio{id}.html", portfolio_id=portfolio_id, portfolio=portfolio, investments=investments, portfolio1=portfolio1, portfolio1_name=portfolio1_name, portfolio2=portfolio2, portfolio2_name=portfolio2_name, portfolio3=portfolio3, portfolio3_name=portfolio3_name)
-
-# -------------------------------------------------------------------------------------------------------
-# -------------- DELETE FROM PORTFOLIO [POST]
-# -------------------------------------------------------------------------------------------------------
-
-@app.route("/delete-portfolio", methods=["POST"])
-@login_required
-def delete_portfolio_post():
-
-    name = session.get("user_id")
-    id = request.form.get("id")
-    portfolio_id = f"portfolio{id}"
-    symbols = request.form.getlist("symbols[]")
-
-    # Delete symbols in symbol list from database
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-
-    for i in range(0, len(symbols)):
-        cursor.execute("DELETE FROM portfolios WHERE users_id = ? AND portfolio_id = ? AND symbol = ?", (name, portfolio_id, symbols[i],))
-
-    conn.commit()
-    conn.close()
-
-    return redirect("/portfolio")
-
-
-
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-#>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
-
-
-# -------------------------------------------------------------------------------------------------------
-# -------------- CURRENT PORTFOLIOS PAGE
-# -------------------------------------------------------------------------------------------------------
-
-
-@app.route("/portfolio", methods=["GET"])
-@login_required
-def portfolio_page():
-    name = session.get("user_id")
-
-    conn = sqlite3.connect('database.db')
-    cursor = conn.cursor()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE users_id = ?", (name,))
-    investments = cursor.fetchall()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio1' AND users_id = ?", (name,))
-    portfolio1 = cursor.fetchall()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio2' AND users_id = ?", (name,))
-    portfolio2 = cursor.fetchall()
-    
-    cursor.execute("SELECT * FROM portfolios WHERE portfolio_id = 'portfolio3' AND users_id = ?", (name,))
-    portfolio3 = cursor.fetchall()
-    
-    
-    portfolio1_name = portfolio_names(portfolio1)
-    portfolio2_name = portfolio_names(portfolio2)
-    portfolio3_name = portfolio_names(portfolio3)
-
-    conn.commit()
-    conn.close()
-
-    return render_template("portfolio.html", investments=investments, portfolio1=portfolio1, portfolio2=portfolio2, portfolio3=portfolio3, portfolio1_name=portfolio1_name, portfolio2_name=portfolio2_name, portfolio3_name=portfolio3_name)
-
-
 #>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>
 # -----------------------------------------------------------------------------------------------
 # ------------SUMMARY BREADTH PAGES
@@ -704,7 +721,7 @@ def portfolio_page():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE SECTOR SUMMARY PAGE [GET]
+# -------------- CORE SECTOR Breadth Summary Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/sector-summary")
@@ -820,7 +837,7 @@ def sector_summary():
     return render_template("sector-summary.html", total_ema20=total_ema20, total_sma50=total_sma50, total_sma200=total_sma200, portfolio1_ema20_summary=portfolio1_ema20_summary, portfolio1_sma50_summary=portfolio1_sma50_summary, portfolio1_sma200_summary=portfolio1_sma200_summary, portfolio2_ema20_summary=portfolio2_ema20_summary, portfolio2_sma50_summary=portfolio2_sma50_summary, portfolio2_sma200_summary=portfolio2_sma200_summary, portfolio3_ema20_summary=portfolio3_ema20_summary, portfolio3_sma50_summary=portfolio3_sma50_summary, portfolio3_sma200_summary=portfolio3_sma200_summary, portfolio1_name=portfolio1_name, portfolio2_name=portfolio2_name, portfolio3_name=portfolio3_name)
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE SECTOR SUMMARY PAGE [POST]
+# -------------- CORE SECTOR Breadth Summary [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/sector-summary", methods=["POST"])
@@ -940,7 +957,7 @@ def sector_summary_post():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE INDEX SUMMARY PAGE [GET]
+# -------------- CORE INDEX Breadth Summary Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/index-summary")
@@ -1058,7 +1075,7 @@ def index_summary():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CORE INDEX SUMMARY PAGE [POST]
+# -------------- CORE INDEX Breadth Summary [POST]
 # -------------------------------------------------------------------------------------------------------
 @app.route("/index-summary", methods=["POST"])
 @login_required
@@ -1177,7 +1194,7 @@ def index_summary_post():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- BREADTH SUMMARY PAGE [GET]
+# -------------- PORTFOLIO Breadth Summary Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/summary")
@@ -1296,7 +1313,7 @@ def summary():
     
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- BREADTH SUMMARY PAGE [POST]
+# -------------- PORTFOLIO Breadth Summary [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/summary", methods=["POST"])
