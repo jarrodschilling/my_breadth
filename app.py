@@ -16,6 +16,7 @@ app = Flask(__name__)
 # LOGIN/REGISTRATION PAGES: Setup Session/Cache, Login User, Log Out User, Register User
 # BASIC PAGES: Home Page, FAQ, Contact Form, Current Portfolios Page
 # PORTFOLIO CREATION/ALTERATION: Create Portfolio Page, Add to Portfolio, Delete From Portfolio
+# DETAIL BREADTH PAGES - RE-ORDER TO PORTFOLIO FIRST
 
 
 
@@ -265,7 +266,7 @@ def portfolio_page():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- CREATE PORTFOLIO PAGE [GET]
+# -------------- Create Portfolio Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/create-portfolio", methods=["GET"])
@@ -299,7 +300,7 @@ def create_portfolio_page():
     
 
 # -------------------------------------------------------------------------------------------------------    
-# -------------- CREATE PORTFOLIO [POST] 
+# -------------- Create Portfolio [POST] 
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/create-portfolio", methods=["POST"])
@@ -324,7 +325,7 @@ def create_portfolio():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- ADD PORTFOLIO PAGE [GET]
+# -------------- Add to Portfolio Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/add-portfolio/<id>", methods=["GET"])
@@ -339,7 +340,7 @@ def add_portfolio_page(id):
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- ADD TO PORTFOLIO [POST]
+# -------------- Add to Portfolio [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/add-portfolio", methods=["POST"])
@@ -364,7 +365,7 @@ def add_portfolio():
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- DELETE FROM PORTFOLIO PAGE [GET]
+# -------------- Delete From Portfolio Page [GET]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/delete-portfolio/<id>", methods=["GET"])
@@ -403,7 +404,7 @@ def delete_portfolio(id):
 
 
 # -------------------------------------------------------------------------------------------------------
-# -------------- DELETE FROM PORTFOLIO [POST]
+# -------------- Delete From Portfolio [POST]
 # -------------------------------------------------------------------------------------------------------
 
 @app.route("/delete-portfolio", methods=["POST"])
