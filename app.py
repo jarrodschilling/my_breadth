@@ -1,16 +1,16 @@
 import sqlite3
 from flask import Flask, redirect, render_template, request, session
 from flask_session import Session
+import random
 from dictionaries import sectors, industries, sub_sectors, indices
 from investor_quotes import quotes
-import random
+from functions import login_required, portfolio_names, symbol_check, register_errors, login_errors, is_valid_password, create_errors, ma_compute_yf, add_symbols, get_port_name
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-from functions import login_required, portfolio_names, symbol_check, register_errors, login_errors, is_valid_password, create_errors, ma_compute_yf, add_symbols, get_port_name
 # flask --app example_app.py --debug run
 
-
 app = Flask(__name__)
+
 
 # TABLE OF CONTENTS
 # LOGIN/REGISTRATION PAGES: Setup Session/Cache, Login User, Log Out User, Register User
@@ -1432,3 +1432,7 @@ def index_summary_post():
 
 
     return render_template("index-summary.html", total_ema20=total_ema20, total_sma50=total_sma50, total_sma200=total_sma200, portfolio1_ema20_summary=portfolio1_ema20_summary, portfolio1_sma50_summary=portfolio1_sma50_summary, portfolio1_sma200_summary=portfolio1_sma200_summary, portfolio2_ema20_summary=portfolio2_ema20_summary, portfolio2_sma50_summary=portfolio2_sma50_summary, portfolio2_sma200_summary=portfolio2_sma200_summary, portfolio3_ema20_summary=portfolio3_ema20_summary, portfolio3_sma50_summary=portfolio3_sma50_summary, portfolio3_sma200_summary=portfolio3_sma200_summary, portfolio1_name=portfolio1_name, portfolio2_name=portfolio2_name, portfolio3_name=portfolio3_name)
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
