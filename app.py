@@ -39,7 +39,7 @@ Session(app)
 
 @app.after_request
 def after_request(response):
-    """Ensure responses aren't cached"""
+    #Ensure responses aren't cached
     response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
@@ -139,12 +139,12 @@ def signup_post():
             return register_errors("That username already exists, please choose another one")
     
     # Check that username and password are each between 5 and 25 characters long
-    if len(username) < 5:
-        return register_errors("Username must be atleast 5 characters long")
+    if len(username) < 8:
+        return register_errors("Username must be atleast 8 characters long")
     if len(username) > 25:
         return register_errors("Username cannot be more than 25 characters long")
-    if len(password) < 5:
-        return register_errors("Password must be atleast 5 characters long")
+    if len(password) < 8:
+        return register_errors("Password must be atleast 8 characters long")
     if len(username) > 25:
         return register_errors("Password cannot be more than 25 characters long") 
 
