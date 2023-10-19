@@ -122,7 +122,16 @@ def batch_api_call(symbols):
     data = {}
     for symbol in symbols:
         data[symbol] = api_call(symbol)
+    
+
     return data
+
+
+# Testing new API function
+def api_historical_data(symbols):
+    data = yf.download(symbols, start="2022-01-01", end="2023-10-18")
+    return data['Close']
+
 
 
 # Iterate list of stocks to determine if they are above trending EMAs/SMAs
