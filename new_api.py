@@ -4,11 +4,70 @@ import datetime
 import pandas as pd
 from dictionaries import industries, sub_sectors
 
+stock_symbols = ["AAPL", "GOOGL", "MSFT", "AMZN", "TSLA"]
+# data = yf.download(stock_symbols, period="2y")
+# data = data['Adj Close']
 
-# Testing new API function
-def api_historical_data(symbols):
-    data = yf.download(symbols, start="2022-01-01", end="2023-10-18")
-    return data['Adj Close']
+def data_call(stocks):
+    data = yf.download(stocks, period="2y")
+    data = data['Adj Close']
+    return data
+
+def current_price(stock_data, date):
+    if date == "today":
+        return stock_data.iloc[-1]
+    elif date == "yesterday":
+        return stock_data.iloc[-2]
+    
+
+def ema_20_day(stock_data, period, date):
+    data = stock_data.ewm(span=period, adjust=False).mean()
+    if date == "today":
+        return data.iloc[-1]
+    elif date == "yesterday":
+        return data.iloc[-2]
+    
+def simple_ma(stock_data, period, date):
+    data = stock_data.rolling(window=period).mean()
+    if date == "today":
+        return data.iloc[-1]
+    elif date == "yesterday":
+        return data.iloc[-2]
+
+def ma_compute2(stocks, date):
+    ema20_list = []
+    sma50_list = []
+    sma200_list = []
+    data = data_call(stocks)
+    for stock in stocks:
+        stock_data = data[stock]
+        price = current_price(stock_data, date)
+        ema20 = ema_20_day(stock_data, 20, date)
+        sma50 = simple_ma(stock_data, 50, date)
+        sma200 = simple_ma(stock_data, 200, date)
+        if price > ema20 and ema20 > sma50 and sma50 > sma200:
+            ema20_list.append(stock)
+            sma50_list.append(stock)
+            sma200_list.append(stock)
+        elif price > sma50 and sma50 > sma200:
+            sma50_list.append(stock)
+            sma200_list.append(stock)
+        elif price > sma200:
+            sma200_list.append(stock)
+    print(sma50_list)
+    print(sma200_list)
+
+
+ma_compute2(sub_sectors, "today")
+
+
+
+# moving_average = data["MSFT"].rolling(window=50).mean()
+# moving_average = moving_average.iloc[-1]
+# print(moving_average)
+
+
+
 
 
 # Get current price using API CALL data ------------------------ **THIS NEEDS UPDATING**
@@ -60,30 +119,24 @@ def ma_compute_yf(stocks, portfolio_id, ma_avg, date):
     # Batch API call for all symbols
     data = api_historical_data(symbols_to_fetch)
 
+    print(data)
+
     for stock in stocks:
         symbol = stock[1]
-        name = stock[2]
-        portfolio = stock[4]
-        current = current_price(data, date)
-        ema20 = ema(data, 20, date)
-        sma50 = sma(data, 50, date)
-        sma200 = sma(data, 200, date)
+        current = current_price(data[stock], date)
+        ema20 = ema(data[stock]['Adj Close'], 20, date)
+        sma50 = sma(data[stock], 50, date)
+        sma200 = sma(data[stock], 200, date)
         
-        if portfolio == portfolio_id:
-            if (ma_avg == "ema20") and current > ema20 and ema20 > sma50 and sma50 > sma200:
-                portfolio_ma.append(symbol)
-                stock_name.append(name)
-            elif (ma_avg == "sma50") and current > sma50 and sma50 > sma200:
-                portfolio_ma.append(symbol)
-                stock_name.append(name)
-            elif (ma_avg == "sma200") and current > sma200:
-                portfolio_ma.append(symbol)
-                stock_name.append(name)
-
-    result = []
-    for x, y in zip(portfolio_ma, stock_name):
-        result.append([x, y])
+        if (ma_avg == "ema20") and current > ema20 and ema20 > sma50 and sma50 > sma200:
+            portfolio_ma.append(symbol)
+        elif (ma_avg == "sma50") and current > sma50 and sma50 > sma200:
+            portfolio_ma.append(symbol)
+        elif (ma_avg == "sma200") and current > sma200:
+            portfolio_ma.append(symbol)
     
-    return result
+    return portfolio_ma
 
-ma_compute_yf(sub_sectors, "portfolio1", "ema20", "today")
+
+
+# ma_compute_yf(random, "portfolio1", "ema20", "today")
