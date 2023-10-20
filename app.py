@@ -675,9 +675,9 @@ def index_detail():
 @app.route("/index-detail", methods=["POST"])
 @login_required
 def index_detail_post():
-    print("successful")
+
     date = request.form.get("date")
-    print(date)
+
 
     conn = sqlite3.connect('database.db')
     cursor = conn.cursor()
