@@ -123,7 +123,6 @@ def batch_api_call(symbols):
     for symbol in symbols:
         data[symbol] = api_call(symbol)
     
-
     return data
 
 
